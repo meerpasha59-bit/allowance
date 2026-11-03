@@ -1,0 +1,7 @@
+<!doctype html><meta charset=utf-8><title>Allowance</title>
+<body style="font-family:sans-serif;max-width:640px;margin:2em auto">
+<h1>Allowance</h1><p>AI shopping agent with a PayPal-enforced budget (sandbox).</p>
+<input id=q size=50 value="art supplies for school"> <button onclick=plan()>Plan cart</button>
+<pre id=out></pre><button id=buy style=display:none onclick=buy()>Checkout via PayPal sandbox</button>
+<script>let cur;async function plan(){const r=await(await fetch('/api/plan',{method:'POST',body:JSON.stringify({request:q.value})})).json();cur=r;out.textContent=r.explanation+'\n\nTotal $'+r.evaluation.total+'\nDecision: '+r.evaluation.decision+'\n'+r.evaluation.violations.join('\n');buy.style.display='';buy.textContent=r.evaluation.decision=='auto_approve'?'Checkout via PayPal sandbox':'Approve & checkout (over limits)'}
+async function buy(){const r=await(await fetch('/api/checkout',{method:'POST',body:JSON.stringify({cart:cur.cart,approved:cur.evaluation.decision!='auto_approve'})})).json();out.textContent=JSON.stringify(r,null,1)}</script>
